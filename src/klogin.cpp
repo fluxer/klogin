@@ -2,7 +2,6 @@
 #include <QIcon>
 #include <QDir>
 #include <QProcess>
-#include <QUuid>
 #include <QSettings>
 #include <QDesktopWidget>
 #include <QStandardPaths>
@@ -28,7 +27,7 @@ class KLogin : public QMainWindow {
     Q_OBJECT
 
     public:
-        KLogin(QWidget *parent = Q_NULLPTR, Qt::WindowFlags flags = Qt::Window);
+        KLogin(QWidget *parent = nullptr, Qt::WindowFlags flags = Qt::Window);
         ~KLogin();
 
         void loginProcess(const QByteArray username, const QByteArray session);
@@ -166,7 +165,7 @@ void KLogin::slotLogin() {
                 const long int pw_inact = spw->sp_inact;
                 const long int pw_expire = spw->sp_expire;
 
-                const time_t current = ::time(Q_NULLPTR) / 86400L;
+                const time_t current = ::time(nullptr) / 86400L;
                 if (pw_max != -1 && pw_max < current) {
                     qCritical() << "you must change your password" << current << pw_max;
                     goback = true;
@@ -319,7 +318,7 @@ void KLogin::loginProcess(const QByteArray username, const QByteArray session) {
             qWarning() << "gethostname" << ::strerror(errno);
         }
         const QString pw_hostname = QString::fromLatin1(buffer);
-        const QByteArray pw_randomkey = QUuid::createUuid().toByteArray();
+        const QByteArray pw_randomkey = qRandomUuid();
         const QStringList xauth_args = QStringList() << "add"
             << pw_hostname + pw_display << "." << pw_randomkey;
         if (QProcess::execute("xauth", xauth_args) != 0) {
@@ -330,7 +329,7 @@ void KLogin::loginProcess(const QByteArray username, const QByteArray session) {
     // TODO: utmp?
 
     qDebug() << "executing" << session;
-    const int status = ::execl(session.constData(), session.constData(), Q_NULLPTR);
+    const int status = ::execl(session.constData(), session.constData(), nullptr);
     if (status != 0) {
         qCritical() << "execl error" << ::strerror(errno);
     }
